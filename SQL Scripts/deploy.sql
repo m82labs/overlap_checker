@@ -1,4 +1,5 @@
---== Creates the 'DBTools' database, the job delay table, and the GetJobData stored proc.
+--== Creates the 'DBTools' database, the job delay table, the GetJobData stored proc
+--== and the proc used to add delay steps.
 --== LOOK THROUGH THESE SCRIPTS AND MAKE CHANGES IF YOU PLAN TO USE A DIFFERENT DB.
 
 --== Database
