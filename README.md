@@ -12,3 +12,6 @@ Installation is fairly straight forward:
  
 ##Troubleshooting##
 Coming Soon
+
+##Disclaimer##
+This is my first time posting C# code to Git, and my second time ( maybe third) ever writing C#. Feedback is **VERY** welcome.
