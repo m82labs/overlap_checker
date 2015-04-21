@@ -10,5 +10,6 @@ Installation is fairly straight forward:
   2. Open the solution and build it.
   3. Run `deploy.sql` on any instance you want to run the Overlap Checker on.
  
+ 
  ##Troubleshooting##
  Coming Soon
