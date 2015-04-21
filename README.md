@@ -2,7 +2,7 @@
 Application to reduce SQL Agent Job overlaps by introducing calculated job delays.
 
 ##Overview##
-For a quick overview, please read my blog post on this project: 
+For a quick overview, please read through the code comments, and my blog post on this project: 
 
 ##Installation##
 Installation is fairly straight forward:
