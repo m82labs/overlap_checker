@@ -8,7 +8,9 @@ For a quick overview, please read my blog post on this project:
 Installation is fairly straight forward:
   1. Clone this repo.
   2. Open the solution and build it.
-  3. Run `deploy.sql` on any instance you want to run the Overlap Checker on.
+  3. Run `SQL Scripts\deploy.sql` on any instance you want to run the Overlap Checker on.
+
+***WARNING: Read through the deploy.sql script, it will create various database objects and add a new 'Deploy' step to ALL jobs on the instance.***
  
 ##Troubleshooting##
 Coming Soon
