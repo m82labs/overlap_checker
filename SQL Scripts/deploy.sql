@@ -309,3 +309,6 @@ END
 CLOSE JobCursor;
 DEALLOCATE JobCursor;
 GO
+
+--== Add 'Delay' Steps
+EXEC DBTools.dbo.[AddJobDelayStep] @operation = 'A'
