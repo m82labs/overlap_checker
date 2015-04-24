@@ -6,6 +6,12 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
+IF OBJECT_ID('DBTools..GetJobData') IS NULL
+BEGIN
+	EXEC('CREATE PROCEDURE [GetJobData] AS SELECT 1;');
+END
+GO
+
 ----------------------------------------------------------------------------------
 -- Procedure Name: GetJobData
 --
