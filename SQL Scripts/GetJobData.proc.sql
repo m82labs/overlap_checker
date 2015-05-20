@@ -41,6 +41,8 @@ GO
 -- ----------------
 -- Date - Auth: 2015.04.23 22:20 - Mark Wilkinson
 -- Description: Simplified the logic, added support for job execution periods.
+-- Date - Auth: 2015.05.18 - M.Wilkinson
+-- Description: Added JOIN to job exclusion table. Search for tag '#exc' to modify
 ----------------------------------------------------------------------------------
 
 ALTER PROCEDURE [GetJobData]
@@ -71,7 +73,8 @@ SELECT
         END
     ) AS interval_sec,
     COUNT(ss.schedule_id) OVER (PARTITION BY sj.job_id) AS schedule_count,
-	msdb.dbo.agent_datetime(@currentDate,ss.active_end_time) AS job_end
+	msdb.dbo.agent_datetime(@currentDate,ss.active_end_time) AS job_end,
+     jde.calculate_delay
 FROM
     msdb.dbo.sysjobs AS sj
     INNER JOIN msdb.dbo.sysjobschedules AS sjs ON
@@ -103,6 +106,8 @@ FROM
         GROUP BY
             sjh.job_id
     ) AS run_data
+    LEFT OUTER JOIN [JobDelay_Exclusion] AS jde --#exc
+        ON sj.name = jde.job_name
 WHERE
     sj.enabled = 1
     AND ss.freq_type = 4
@@ -114,6 +119,7 @@ WHERE
         jd.name AS job_name,
         jd.interval_sec,
         jd.avg_dur,
+        jd.calculate_delay,
         jd.start_datetime AS run_datetime,
         DATEADD(second,jd.avg_dur,jd.start_datetime) AS end_datetime,
 		jd.job_end
@@ -130,6 +136,7 @@ WHERE
         dr.job_name,
         dr.interval_sec,
         dr.avg_dur,
+        dr.calculate_delay,
         DATEADD(second,dr.interval_sec,dr.run_datetime) AS run_datetime,
         DATEADD(second,dr.interval_sec,dr.end_datetime) AS end_datetime,
 		dr.job_end
@@ -143,6 +150,7 @@ SELECT
     job_name,
     interval_sec,
     avg_dur,
+    calculate_delay,
     run_datetime,
     end_datetime
 FROM
