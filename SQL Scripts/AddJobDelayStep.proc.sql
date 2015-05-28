@@ -31,8 +31,9 @@ GO
 --
 -- Change History
 -- ----------------
--- Date - Auth: 
--- Description: 
+-- Date - Auth: 2015.05.28 - M.Wilkinson
+-- Description: This was originally written for an MSX/TSX environment. It will
+--              now work in any environment.
 ----------------------------------------------------------------------------------
 
 ALTER PROCEDURE [AddJobDelayStep]
@@ -56,13 +57,9 @@ FROM
     msdb.dbo.sysjobservers sjs
     JOIN msdb.dbo.sysjobs sj
         ON sj.job_id = sjs.job_id
-    INNER JOIN msdb.dbo.systargetservers AS sts
-        ON sts.server_id = sjs.server_id
 WHERE
-    sts.server_name <> @@servername
-    AND sj.enabled = 1
+    sj.enabled = 1
     AND sj.originating_server_id = 0
-    AND sj.name <> N'Check replicated subscriber rowcounts';
 
 OPEN JobCursor;
 

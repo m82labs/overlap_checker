@@ -27,6 +27,9 @@ GO
 --        @maxInterval -    Similar to @minInterval. This specifies the maximum 
 --                          run interval. If you only want jobs that run more than 
 --                          once every twelve hours, you would set this to 43200
+--        @exclusionStr -   This is the string that is searched for in the job 
+--                          category name to determine if a job should be excluded
+--                          from delay calculations.
 --
 -- Returns:
 -- Returns all job executions for the specified period. These aren't actual
@@ -42,14 +45,16 @@ GO
 -- Date - Auth: 2015.04.23 22:20 - Mark Wilkinson
 -- Description: Simplified the logic, added support for job execution periods.
 -- Date - Auth: 2015.05.18 - M.Wilkinson
--- Description: Added JOIN to job exclusion table. Search for tag '#exc' to modify
+-- Description: Added JOIN to get job category to handle job exclusions. Search
+--              for tag '#mod1' to modify (Thanks TheMOb)
+-- Date - Auth: 2015.05.28 - M.Wilkinson
 ----------------------------------------------------------------------------------
 
 ALTER PROCEDURE [GetJobData]
 (
 @timePeriodHr INT = 24,
 @minInterval INT = 120,
-@maxInterval INT = 43200
+@maxInterval INT = 43200,
 )
 AS
 SET NOCOUNT ON
@@ -73,8 +78,8 @@ SELECT
         END
     ) AS interval_sec,
     COUNT(ss.schedule_id) OVER (PARTITION BY sj.job_id) AS schedule_count,
-	msdb.dbo.agent_datetime(@currentDate,ss.active_end_time) AS job_end,
-     jde.calculate_delay
+    msdb.dbo.agent_datetime(@currentDate,ss.active_end_time) AS job_end,
+    ( CASE WHEN sc.name LIKE '%' + @exclusionStr + '%' THEN 0 ELSE 1 END ) AS calculate_delay -- #mod1
 FROM
     msdb.dbo.sysjobs AS sj
     INNER JOIN msdb.dbo.sysjobschedules AS sjs ON
@@ -106,8 +111,8 @@ FROM
         GROUP BY
             sjh.job_id
     ) AS run_data
-    LEFT OUTER JOIN [JobDelay_Exclusion] AS jde --#exc
-        ON sj.name = jde.job_name
+    INNER JOIN msdb.dbo.syscategories AS sc -- #mod1
+        ON sj.category_id = sc.category_id
 WHERE
     sj.enabled = 1
     AND ss.freq_type = 4
@@ -122,7 +127,7 @@ WHERE
         jd.calculate_delay,
         jd.start_datetime AS run_datetime,
         DATEADD(second,jd.avg_dur,jd.start_datetime) AS end_datetime,
-		jd.job_end
+	   jd.job_end
     FROM
         JobData AS jd
     WHERE
@@ -139,7 +144,7 @@ WHERE
         dr.calculate_delay,
         DATEADD(second,dr.interval_sec,dr.run_datetime) AS run_datetime,
         DATEADD(second,dr.interval_sec,dr.end_datetime) AS end_datetime,
-		dr.job_end
+	   dr.job_end
     FROM
         DaysRun AS dr
     WHERE

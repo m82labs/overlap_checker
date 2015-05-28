@@ -50,20 +50,14 @@ namespace JobOverlapChecker
             Console.WriteLine(string.Format("Checking Overlaps for {0} jobs.", SQLJobData.GetJobList().Count));
             foreach (var j in SQLJobData.Jobs)
             {
-                // Only calculate the delay if it is not exlcuded via the exlcusion table
-                if (j.calculateDelay == true)
-                {
-                    Console.WriteLine(string.Format("Getting Overlap Data for job: {0}", j.jobID));
+                Console.WriteLine(string.Format("Getting Overlap Data for job: {0}", j.jobID));
                 
-                    // Create a collection of execution times for all jobs other than the current job
-                    double[][] otherExecs = SQLJobData.GetOtherJobExecutions(j.jobID);
+                // Create a collection of execution times for all jobs other than the current job
+                double[][] otherExecs = SQLJobData.GetOtherJobExecutions(j.jobID);
 
-                    // Calculate the required job delay to reduce overlaps and set delay
-                    // on the object.
-                    SQLJobData.CommitDelay(j.jobID,j.CalculateDelay(otherExecs));
-                } else {
-                    continue;
-                }
+                // Calculate the required job delay to reduce overlaps and set delay
+                // on the object.
+                SQLJobData.CommitDelay(j.jobID,j.CalculateDelay(otherExecs));
             }
 
             // Write data to SQL server if --calculate_only has not bee passed
@@ -257,6 +251,14 @@ namespace JobOverlapChecker
                     var jobDataProc = ConfigurationManager.AppSettings["JobDataProc"];
                     var jobDataCommand = new SqlCommand(jobDataProc, conn);
                     jobDataCommand.CommandType = CommandType.StoredProcedure;
+                    
+                    // If a custom exclusion string was specified, pass it here
+                    if (ConfigurationManager.AppSettings.AllKeys.Contains("JobExclusionString"))
+                    {
+                        jobDataCommand.Parameters.Add("@exclusionStr", SqlDbType.VarChar, 32).Value = ConfigurationManager.AppSettings["JobExclusionString"];
+                    }
+
+                    // Get our job data
                     var dataReader = jobDataCommand.ExecuteReader();
                     myJobData.Load(dataReader);
                 }
@@ -284,7 +286,7 @@ namespace JobOverlapChecker
                 // Get the job name
                 var jn = jr.Field<string>("job_name");
                 // Get the job exlusion status
-                var d = jr.Field<string>("calculate_delay");
+                var d = jr.Field<Boolean>("calculate_delay");
 
                 // List to store the execution times
                 var eList = new List<double[]>();
@@ -313,10 +315,10 @@ namespace JobOverlapChecker
         }
 
         // methods
-        // returns a unique list of jobs
+        // returns a unique list of jobs to calculate delays for
         public List<string> GetJobList()
         {
-            return (from j in Jobs select j.jobID).Distinct().ToList();
+            return (from j in Jobs where j.calculateDelay == true select j.jobID).Distinct().ToList();
         }
 
         // Returns a list of double for every other job execution
@@ -446,9 +448,6 @@ namespace JobOverlapChecker
         // and compares it to every other execution.
         public Int32 CalculateDelay( double[][] j )
         {
-            // Create a spinner to show progress
-            var spin = new ConsoleSpiner();
-
             // Keep track of overlap count and delay count
             var overlapCount = 1;
             var lastOverlapCount = -1;
@@ -488,9 +487,6 @@ namespace JobOverlapChecker
                         Interlocked.Add(ref overlapCount, x);
                     }
                 );
-                
-                // Show some progress
-                //spin.Turn();
 
                 // This just catches it the first time this runs
                 if (lastOverlapCount == -1)
@@ -514,27 +510,6 @@ namespace JobOverlapChecker
             Console.WriteLine(string.Format("Delay: {0}\nFinal Overlaps: {1}\n", currentDelay, lastOverlapCount));
 
             return currentDelay;
-        }
-    }
-
-    public class ConsoleSpiner
-    {
-        int counter;
-        public ConsoleSpiner()
-        {
-            counter = 0;
-        }
-        public void Turn()
-        {
-            counter++;
-            switch (counter % 4)
-            {
-                case 0: Console.Write("|"); break;
-                case 1: Console.Write("/"); break;
-                case 2: Console.Write("-"); break;
-                case 3: Console.Write("\\"); break;
-            }
-            Console.SetCursorPosition(Console.CursorLeft - 1, Console.CursorTop);
         }
     }
 
