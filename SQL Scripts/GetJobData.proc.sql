@@ -1,4 +1,4 @@
-USE [DBTools]
+USE {{{dbName}}}
 GO
 
 SET ANSI_NULLS ON
@@ -6,7 +6,7 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-IF OBJECT_ID('DBTools..GetJobData') IS NULL
+IF OBJECT_ID('{{{dbName}}}..GetJobData') IS NULL
 BEGIN
 	EXEC('CREATE PROCEDURE [GetJobData] AS SELECT 1;');
 END
@@ -55,6 +55,7 @@ ALTER PROCEDURE [GetJobData]
 @timePeriodHr INT = 24,
 @minInterval INT = 120,
 @maxInterval INT = 43200,
+@exclusionStr VARCHAR(32) = 'NoDelay'
 )
 AS
 SET NOCOUNT ON
