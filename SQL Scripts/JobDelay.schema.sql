@@ -1,16 +1,16 @@
-IF DB_ID('DBTools') IS NULL
-CREATE DATABASE DBTools;
-ALTER DATABASE DBTools SET RECOVERY SIMPLE;
+IF DB_ID('{{{dbName}}}') IS NULL
+CREATE DATABASE {{{dbName}}};
+ALTER DATABASE {{{dbName}}} SET RECOVERY SIMPLE;
 GO
 
-USE [DBTools];
+USE [{{{dbName}}}];
 GO
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-IF OBJECT_ID('DBTools.dbo.JobDelay') IS NULL
+IF OBJECT_ID('{{{dbName}}}.dbo.JobDelay') IS NULL
 BEGIN
 	CREATE TABLE [JobDelay](
 		[job_name] [sysname] NOT NULL,
