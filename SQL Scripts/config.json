@@ -1,0 +1,16 @@
+{
+    "connectionStrings": [
+        {
+            "name":"SQLData",
+            "connectionString":"Data Source=localhost;Initial Catalog=DBTools;Integrated Security=true;",
+            "providerName":"System.Data.SqlClient"
+        }
+    ],
+    "instance":"",
+    "schema":"",
+    "targetTable":"JobDelay",
+    "procedures": [
+        { "name":"jobData","procedure":"GetJobData" }
+    ],
+    "jobExclusionString":"NoDelay"
+}

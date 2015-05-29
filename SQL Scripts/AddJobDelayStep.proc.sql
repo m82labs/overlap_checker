@@ -6,7 +6,7 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-IF OBJECT_ID('{{{dbName}}}..AddJobDelayStep') IS NULL
+IF OBJECT_ID('{{{dbName}}}.{{{schema}}}.AddJobDelayStep') IS NULL
 BEGIN
 	EXEC('CREATE PROCEDURE [AddJobDelayStep] AS SELECT 1;');
 END
@@ -90,7 +90,7 @@ BEGIN
             DECLARE @waitfor CHAR(8);
 
             SELECT  @delay = delay_sec
-            FROM    {{{dbName}}}.dbo.JobDelay
+            FROM    {{{dbName}}}.{{{schema}}}.JobDelay
             WHERE   job_name = "{{@job_name}}"
                         
             SET @waitfor = LEFT(DATEADD(second,ISNULL(@delay,0),CAST("00:00:00" AS TIME)),8);
