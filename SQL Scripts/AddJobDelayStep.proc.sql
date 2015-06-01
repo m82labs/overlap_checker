@@ -8,7 +8,7 @@ GO
 
 IF OBJECT_ID('{{{dbName}}}.{{{schema}}}.AddJobDelayStep') IS NULL
 BEGIN
-	EXEC('CREATE PROCEDURE [AddJobDelayStep] AS SELECT 1;');
+	EXEC('CREATE PROCEDURE [{{{schema}}}].[AddJobDelayStep] AS SELECT 1;');
 END
 GO
 
@@ -36,7 +36,7 @@ GO
 --              now work in any environment.
 ----------------------------------------------------------------------------------
 
-ALTER PROCEDURE [AddJobDelayStep]
+ALTER PROCEDURE [{{{schema}}}].[AddJobDelayStep]
 (
 @operation CHAR(1) = 'A' -- A - Add, D - Delete
 )

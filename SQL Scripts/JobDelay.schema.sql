@@ -1,6 +1,8 @@
 IF DB_ID('{{{dbName}}}') IS NULL
-CREATE DATABASE {{{dbName}}};
-ALTER DATABASE {{{dbName}}} SET RECOVERY SIMPLE;
+BEGIN
+    CREATE DATABASE {{{dbName}}};
+    ALTER DATABASE {{{dbName}}} SET RECOVERY SIMPLE;
+END
 GO
 
 USE [{{{dbName}}}];
@@ -10,9 +12,9 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-IF OBJECT_ID('{{{dbName}}}.dbo.JobDelay') IS NULL
+IF OBJECT_ID('{{{dbName}}}.{{{schema}}}.JobDelay') IS NULL
 BEGIN
-	CREATE TABLE [JobDelay](
+	CREATE TABLE {{{schema}}}.[JobDelay](
 		[job_name] [sysname] NOT NULL,
 		[delay_sec] [int] NULL,
 	 CONSTRAINT [PK_JobDelay] PRIMARY KEY CLUSTERED 

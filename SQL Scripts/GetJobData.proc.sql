@@ -6,9 +6,9 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-IF OBJECT_ID('{{{dbName}}}..GetJobData') IS NULL
+IF OBJECT_ID('{{{dbName}}}.{{{schema}}}.GetJobData') IS NULL
 BEGIN
-	EXEC('CREATE PROCEDURE [GetJobData] AS SELECT 1;');
+	EXEC('CREATE PROCEDURE {{{schema}}}.[GetJobData] AS SELECT 1;');
 END
 GO
 
@@ -50,7 +50,7 @@ GO
 -- Date - Auth: 2015.05.28 - M.Wilkinson
 ----------------------------------------------------------------------------------
 
-ALTER PROCEDURE [GetJobData]
+ALTER PROCEDURE {{{schema}}}.[GetJobData]
 (
 @timePeriodHr INT = 24,
 @minInterval INT = 120,
