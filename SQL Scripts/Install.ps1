@@ -13,7 +13,7 @@
 
 # ==== Parameters -------------------------------------------------------------
 param (
-    [Parameter(Mandatory=$True, Position=0, HelpMessage="Instance name(s) you are deploying to.")][string]$instancename,
+    [Parameter(Mandatory=$True, Position=0, HelpMessage="Instance name(s) you are deploying to. If you are specifying multiple instances, they must be comma separated.")][string]$instancename,
     [Parameter(Mandatory=$False, Position=1, HelpMessage="Database name objects should be deployed to.")][string]$databaseName = 'DBTools',
     [Parameter(Mandatory=$False, Position=2, HelpMessage="Database schema name objects should be deployed to.")][string]$schemaName = 'dbo'
 )
@@ -53,9 +53,6 @@ $AddJobDelayStep_Script_str = ($AddJobDelayStep_Script_str.Replace('{{{dbName}}}
 $JobDelaySchema_Script_str = ($JobDelaySchema_Script_str.Replace('{{{dbName}}}',$databaseName)).Replace('{{{schema}}}',$schemaName)
 # ====-------------------------------------------------------------------------
 
-$GetJobData_Script_str
-Break
-
 # ==== Define our script block ------------------------------------------------
 $script_block = {
     param($i,$scr1,$scr2,$scr3)
@@ -72,9 +69,9 @@ $script_block = {
     } else {
         # If it is up, try to deploy scripts
         Try {
-            $result = Invoke-Sqlcmd -ServerInstance $i -Query $scr1 -QueryTimeout 1 -ErrorAction Stop
-            $result = Invoke-Sqlcmd -ServerInstance $i -Query $scr2 -QueryTimeout 1 -ErrorAction Stop
-            $result = Invoke-Sqlcmd -ServerInstance $i -Query $scr3 -QueryTimeout 1 -ErrorAction Stop
+            $result = Invoke-Sqlcmd -ServerInstance $i -Query $scr1 -ErrorAction Stop
+            $result = Invoke-Sqlcmd -ServerInstance $i -Query $scr2 -ErrorAction Stop
+            $result = Invoke-Sqlcmd -ServerInstance $i -Query $scr3 -ErrorAction Stop
 
             Write-Host "Deployment to $i is complete." -ForegroundColor White -BackgroundColor Green
         }
