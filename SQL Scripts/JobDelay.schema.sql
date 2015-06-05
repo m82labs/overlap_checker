@@ -12,6 +12,11 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
+IF SCHEMA_ID('{{{schema}}}') IS NULL
+BEGIN
+	EXEC('CREATE SCHEMA {{{schema}}}')
+END
+
 IF OBJECT_ID('{{{dbName}}}.{{{schema}}}.JobDelay') IS NULL
 BEGIN
 	CREATE TABLE {{{schema}}}.[JobDelay](

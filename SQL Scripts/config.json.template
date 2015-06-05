@@ -2,12 +2,11 @@
     "connectionStrings": [
         {
             "name":"SQLData",
-            "connectionString":"Data Source=localhost;Initial Catalog=DBTools;Integrated Security=true;",
-            "providerName":"System.Data.SqlClient"
+            "connectionString":"Data Source=localhost;Initial Catalog={{{dbName}}};Integrated Security=true;",
         }
     ],
-    "instance":"",
-    "schema":"",
+    "instance":"localhost",
+    "schema":"{{{schema}}}",
     "targetTable":"JobDelay",
     "procedures": [
         { "name":"jobData","procedure":"GetJobData" }
