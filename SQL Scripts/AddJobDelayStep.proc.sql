@@ -111,7 +111,7 @@ BEGIN
                                      @os_run_priority = 0,
                                      @subsystem = N'TSQL',
                                      @command = @sqlCmd,
-                                     @database_name = N'Common',
+                                     @database_name = N'tempdb',
                                      @flags = 0;
 
     END

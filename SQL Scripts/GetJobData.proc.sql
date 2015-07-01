@@ -80,7 +80,7 @@ SELECT
     ) AS interval_sec,
     COUNT(ss.schedule_id) OVER (PARTITION BY sj.job_id) AS schedule_count,
     msdb.dbo.agent_datetime(@currentDate,ss.active_end_time) AS job_end,
-    ( CASE WHEN sc.name LIKE '%' + @exclusionStr + '%' THEN 0 ELSE 1 END ) AS calculate_delay -- #mod1
+    ( CASE WHEN sc.name LIKE '%' + @exclusionStr + '%' OR sj.description LIKE '%' + @exclusionStr + '%' THEN 0 ELSE 1 END ) AS calculate_delay -- #mod1
 FROM
     msdb.dbo.sysjobs AS sj
     INNER JOIN msdb.dbo.sysjobschedules AS sjs ON
