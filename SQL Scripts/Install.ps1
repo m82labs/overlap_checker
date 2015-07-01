@@ -24,7 +24,7 @@ param (
 [string]$GetJobData_Script = "$ScriptPath\GetJobData.proc.sql"
 [string]$AddJobDelayStep_Script = "$ScriptPath\AddJobDelayStep.proc.sql"
 [string]$JobDelaySchema_Script = "$ScriptPath\JobDelay.schema.sql"
-[string]$ConfigJSON_Script = "$ScriptPath\config.json.template"
+[string]$ConfigJSON_Script = "$ScriptPath\JobOverlapChecker.exe.config.template"
 # ====-------------------------------------------------------------------------
 
 # ==== Validate Parameters and files-------------------------------------------
@@ -107,7 +107,7 @@ Write-Host "Database Deployment Complete."
 
 # Write out the config file
 Try {
-    ($ConfigJSON_Script_str.Replace('{{{dbName}}}',$databaseName)).Replace('{{{schema}}}',$schemaName) | Out-File "$ScriptPath\config.json"
+    ($ConfigJSON_Script_str.Replace('{{{dbName}}}',$databaseName)).Replace('{{{schema}}}',$schemaName) | Out-File "$ScriptPath\JobOverlapChecker.exe.config"
     Write-Host "Config file generated. This file will need to be copied, along with the executable, to all SQL instances."
 }
 Catch {
