@@ -8,14 +8,14 @@ For a quick overview, please read through the code comments, and my blog post on
 Installation is fairly straight forward:
   1. Clone this repo.
   2. Open the solution and build it.
-  3. Run `SQL Scripts\deploy.sql` on any instance you want to run the Overlap Checker on.
-  4. Now just copy the `JobOverlapChecker.exe` and `JobOverlapChecker.exe.config` files to each instance and the set up a scheduled job on each instance that executes the JobOverlapChecker.exe. 
+  3. Run `SQL Scripts\Install.ps1` on any instance you want to run the Overlap Checker on.
+  4. Now just copy the `JobOverlapChecker\bin\Debug\JobOverlapChecker.exe` and `SQL Scripts\JobOverlapChecker.exe.config` files to each instance and then set up a scheduled job on each instance that executes the JobOverlapChecker.exe. 
 
-  ***WARNING: Read through the `deploy.sql` script, it will create various database objects and add a new 'Deploy' step to ALL jobs on the instance.***
+  ***WARNING: Read through the `Install.ps1` script, it will create various database objects and add a new 'Deploy' step to ALL jobs on the instance.***
 
 Here is an example `JobOverlapChecker.exe.config` file:
 ```
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <configuration>
     <startup> 
         <supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.5" />
@@ -26,14 +26,14 @@ Here is an example `JobOverlapChecker.exe.config` file:
             providerName="System.Data.SqlClient"/>
     </connectionStrings>
   <appSettings>
-    <add key="Instance" value="localhost"/>
+    <add key="Instance" value=""/>
+    <add key="Schema" value=""/>
     <add key="TargetTable" value="JobDelay"/>
+    <add key="JobDataProc" value="GetJobData"/>
+    <add key="JobExclusionString" value="NoDelay"/>
   </appSettings>
 </configuration>
 ```
- 
-##Troubleshooting##
-Coming Soon
 
 ##Disclaimer##
 This is my first time posting C# code to Git, and my second time ( maybe third) ever writing C#. Feedback is **VERY** welcome.
