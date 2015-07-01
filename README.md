@@ -8,8 +8,8 @@ For a quick overview, please read through the code comments, and my blog post on
 Installation is fairly straight forward:
   1. Clone this repo.
   2. Open the solution and build it.
-  3. Run `SQL Scripts\Install.ps1` on any instance you want to run the Overlap Checker on.
-  4. Now just copy the `JobOverlapChecker\bin\Debug\JobOverlapChecker.exe` and `SQL Scripts\JobOverlapChecker.exe.config` files to each instance and then set up a scheduled job on each instance that executes the JobOverlapChecker.exe. 
+  3. Run `SQL Scripts\Install.ps1` and tell it which instances to install Overlap Checker on, which database to use, and which schema to create the database objects in.
+  4. Now just copy the `JobOverlapChecker\bin\Debug\JobOverlapChecker.exe` and `SQL Scripts\JobOverlapChecker.exe.config` files to a folder on each instance and then set up a scheduled job on each instance with a step that executes `YourDB.YourSchema.AddJobDelayStep @operation = 'A'` followed by a step that executes `JobOverlapChecker.exe`.  This will ensure that every job, even newly created ones, have the delay step added.
 
   ***WARNING: Read through the `Install.ps1` script, it will create various database objects and add a new 'Deploy' step to ALL jobs on the instance.***
 
