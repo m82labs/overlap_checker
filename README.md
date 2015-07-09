@@ -1,6 +1,10 @@
 #Overlap Checker
 Application to reduce SQL Agent Job overlaps by introducing calculated job delays.
 
+###Whats New
+- Added ability to exclude jobs by adding a custom keyword to either the job description or category
+- Updated the installer
+
 ##Overview##
 For a quick overview, please read through the code comments, and my blog post on this project:
 
