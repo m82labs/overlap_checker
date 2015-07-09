@@ -1,4 +1,4 @@
-USE [DBTools]
+USE [{{{dbName}}}]
 GO
 
 SET ANSI_NULLS ON
@@ -6,9 +6,9 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-IF OBJECT_ID('DBTools..AddJobDelayStep') IS NULL
+IF OBJECT_ID('{{{dbName}}}.{{{schema}}}.AddJobDelayStep') IS NULL
 BEGIN
-	EXEC('CREATE PROCEDURE [AddJobDelayStep] AS SELECT 1;');
+	EXEC('CREATE PROCEDURE [{{{schema}}}].[AddJobDelayStep] AS SELECT 1;');
 END
 GO
 
@@ -31,11 +31,12 @@ GO
 --
 -- Change History
 -- ----------------
--- Date - Auth: 
--- Description: 
+-- Date - Auth: 2015.05.28 - M.Wilkinson
+-- Description: This was originally written for an MSX/TSX environment. It will
+--              now work in any environment.
 ----------------------------------------------------------------------------------
 
-ALTER PROCEDURE [AddJobDelayStep]
+ALTER PROCEDURE [{{{schema}}}].[AddJobDelayStep]
 (
 @operation CHAR(1) = 'A' -- A - Add, D - Delete
 )
@@ -56,13 +57,9 @@ FROM
     msdb.dbo.sysjobservers sjs
     JOIN msdb.dbo.sysjobs sj
         ON sj.job_id = sjs.job_id
-    INNER JOIN msdb.dbo.systargetservers AS sts
-        ON sts.server_id = sjs.server_id
 WHERE
-    sts.server_name <> @@servername
-    AND sj.enabled = 1
+    sj.enabled = 1
     AND sj.originating_server_id = 0
-    AND sj.name <> N'Check replicated subscriber rowcounts';
 
 OPEN JobCursor;
 
@@ -93,7 +90,7 @@ BEGIN
             DECLARE @waitfor CHAR(8);
 
             SELECT  @delay = delay_sec
-            FROM    DBTools.dbo.JobDelay
+            FROM    {{{dbName}}}.{{{schema}}}.JobDelay
             WHERE   job_name = "{{@job_name}}"
                         
             SET @waitfor = LEFT(DATEADD(second,ISNULL(@delay,0),CAST("00:00:00" AS TIME)),8);
@@ -114,7 +111,7 @@ BEGIN
                                      @os_run_priority = 0,
                                      @subsystem = N'TSQL',
                                      @command = @sqlCmd,
-                                     @database_name = N'Common',
+                                     @database_name = N'tempdb',
                                      @flags = 0;
 
     END

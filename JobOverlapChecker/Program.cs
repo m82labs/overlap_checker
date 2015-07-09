@@ -220,9 +220,9 @@ namespace JobOverlapChecker
             myJobData.Columns.Add(new DataColumn("job_name", typeof(System.String)));
             myJobData.Columns.Add(new DataColumn("interval_sec", typeof(System.Int32)));
             myJobData.Columns.Add(new DataColumn("avg_dur", typeof(System.Int32)));
+            myJobData.Columns.Add(new DataColumn("calculate_delay", typeof(System.Boolean)));
             myJobData.Columns.Add(new DataColumn("run_datetime", typeof(System.DateTime)));
             myJobData.Columns.Add(new DataColumn("end_datetime", typeof(System.DateTime)));
-
 
             // If source is  CSV, parse the CSV. Otherwise, connect to SQL.
             if ( Parameters.dataSource == "CSV" )
@@ -248,8 +248,17 @@ namespace JobOverlapChecker
                     conn.Open();
 
                     // Retrieve Job Data
-                    var jobDataCommand = new SqlCommand("GetJobData", conn);
+                    var jobDataProc = ConfigurationManager.AppSettings["JobDataProc"];
+                    var jobDataCommand = new SqlCommand(jobDataProc, conn);
                     jobDataCommand.CommandType = CommandType.StoredProcedure;
+                    
+                    // If a custom exclusion string was specified, pass it here
+                    if (ConfigurationManager.AppSettings.AllKeys.Contains("JobExclusionString"))
+                    {
+                        jobDataCommand.Parameters.Add("@exclusionStr", SqlDbType.VarChar, 32).Value = ConfigurationManager.AppSettings["JobExclusionString"];
+                    }
+
+                    // Get our job data
                     var dataReader = jobDataCommand.ExecuteReader();
                     myJobData.Load(dataReader);
                 }
@@ -263,7 +272,7 @@ namespace JobOverlapChecker
             // Read DataTable into a collection of Job objects
             // Get unique job_ids
             var dView = new DataView(myJobData);
-            var jobList = dView.ToTable(true,new string[] {"job_id","job_name","interval_sec","avg_dur"});
+            var jobList = dView.ToTable(true,new string[] {"job_id","job_name","interval_sec","avg_dur","calculate_delay"});
 
             // Loop through unique jobs, create a job object, and add it to the collection
             foreach( DataRow jr in jobList.Rows )
@@ -274,8 +283,10 @@ namespace JobOverlapChecker
                 var j = jr.Field<string>("job_id");                                
                 // Get the average duration
                 var a = jr.Field<Int32>("avg_dur");
-                //Get the job name
+                // Get the job name
                 var jn = jr.Field<string>("job_name");
+                // Get the job exlusion status
+                var d = jr.Field<Boolean>("calculate_delay");
 
                 // List to store the execution times
                 var eList = new List<double[]>();
@@ -296,7 +307,7 @@ namespace JobOverlapChecker
                 }
 
                 // Instantiate a new Job object for the current job
-                var currentJob = new Job(j, jn, i, a, eList);
+                var currentJob = new Job(j, jn, i, a, d, eList);
 
                 // Add our current job object to the collection
                 Jobs.Add(currentJob);
@@ -304,10 +315,10 @@ namespace JobOverlapChecker
         }
 
         // methods
-        // returns a unique list of jobs
+        // returns a unique list of jobs to calculate delays for
         public List<string> GetJobList()
         {
-            return (from j in Jobs select j.jobID).Distinct().ToList();
+            return (from j in Jobs where j.calculateDelay == true select j.jobID).Distinct().ToList();
         }
 
         // Returns a list of double for every other job execution
@@ -368,11 +379,15 @@ namespace JobOverlapChecker
             // Populate the data table
             foreach (var j in Jobs)
             {
-                var newRow = delayResults.NewRow();
-                newRow["job_name"] = j.jobName;
-                newRow["delay_sec"] = j.delaySec;
+                // If we weren't suppose to calculate a delay, don't write it to the table
+                if (j.calculateDelay == true)
+                {
+                    var newRow = delayResults.NewRow();
+                    newRow["job_name"] = j.jobName;
+                    newRow["delay_sec"] = j.delaySec;
 
-                delayResults.Rows.Add(newRow);
+                    delayResults.Rows.Add(newRow);
+                }
             }
 
             // Truncate the target table, then push the datatable to SQL
@@ -414,15 +429,17 @@ namespace JobOverlapChecker
         private readonly int interval;
         private readonly int averageDuration;
         public int delaySec;
+        public Boolean calculateDelay;
         public readonly List<double[]> jobExecutions;
 
         // constructor(s)
-        public Job ( string j, string jn, Int32 i, Int32 a, List<double[]> e ){
+        public Job ( string j, string jn, Int32 i, Int32 a, bool d, List<double[]> e ){
             jobID = j;
             jobName = jn;
             interval = i;
             averageDuration = a;
             jobExecutions = e;
+            calculateDelay = d;
         }
 
         // method(s)
@@ -431,9 +448,6 @@ namespace JobOverlapChecker
         // and compares it to every other execution.
         public Int32 CalculateDelay( double[][] j )
         {
-            // Create a spinner to show progress
-            var spin = new ConsoleSpiner();
-
             // Keep track of overlap count and delay count
             var overlapCount = 1;
             var lastOverlapCount = -1;
@@ -473,9 +487,6 @@ namespace JobOverlapChecker
                         Interlocked.Add(ref overlapCount, x);
                     }
                 );
-                
-                // Show some progress
-                //spin.Turn();
 
                 // This just catches it the first time this runs
                 if (lastOverlapCount == -1)
@@ -499,27 +510,6 @@ namespace JobOverlapChecker
             Console.WriteLine(string.Format("Delay: {0}\nFinal Overlaps: {1}\n", currentDelay, lastOverlapCount));
 
             return currentDelay;
-        }
-    }
-
-    public class ConsoleSpiner
-    {
-        int counter;
-        public ConsoleSpiner()
-        {
-            counter = 0;
-        }
-        public void Turn()
-        {
-            counter++;
-            switch (counter % 4)
-            {
-                case 0: Console.Write("|"); break;
-                case 1: Console.Write("/"); break;
-                case 2: Console.Write("-"); break;
-                case 3: Console.Write("\\"); break;
-            }
-            Console.SetCursorPosition(Console.CursorLeft - 1, Console.CursorTop);
         }
     }
 

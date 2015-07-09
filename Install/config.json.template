@@ -1,0 +1,15 @@
+{
+    "connectionStrings": [
+        {
+            "name":"SQLData",
+            "connectionString":"Data Source=localhost;Initial Catalog={{{dbName}}};Integrated Security=true;",
+        }
+    ],
+    "instance":"localhost",
+    "schema":"{{{schema}}}",
+    "targetTable":"JobDelay",
+    "procedures": [
+        { "name":"jobData","procedure":"GetJobData" }
+    ],
+    "jobExclusionString":"NoDelay"
+}
