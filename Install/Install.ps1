@@ -107,7 +107,7 @@ Write-Host "Database Deployment Complete."
 
 # Write out the config file
 Try {
-    ($ConfigJSON_Script_str.Replace('{{{dbName}}}',$databaseName)).Replace('{{{schema}}}',$schemaName) | Out-File "$ScriptPath\JobOverlapChecker.exe.config"
+    ($ConfigJSON_Script_str.Replace('{{dbName}}',$databaseName)).Replace('{{schema}}',$schemaName) | Out-File "$ScriptPath\JobOverlapChecker.exe.config"
     Write-Host "Config file generated. This file will need to be copied, along with the executable, to all SQL instances."
 }
 Catch {
