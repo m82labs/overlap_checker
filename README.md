@@ -6,7 +6,7 @@ Application to reduce SQL Agent Job overlaps by introducing calculated job delay
 - Updated the installer
 
 ##Overview##
-For a quick overview, please read through the code comments, and my blog post on this project:
+For a quick overview, please read through the code comments, and my blog post on this project: http://m82labs.com/reduce-overlaps/
 
 ##Installation##
 Installation is fairly straight forward:
