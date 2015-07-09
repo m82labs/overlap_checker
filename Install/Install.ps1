@@ -107,11 +107,16 @@ Write-Host "Database Deployment Complete."
 
 # Write out the config file
 Try {
-    ($ConfigJSON_Script_str.Replace('{{dbName}}',$databaseName)).Replace('{{schema}}',$schemaName) | Out-File "$ScriptPath\JobOverlapChecker.exe.config"
-    Write-Host "Config file generated. This file will need to be copied, along with the executable, to all SQL instances."
+    $configFile = ($ConfigJSON_Script_str.Replace('{{dbName}}',$databaseName)).Replace('{{schema}}',$schemaName)
+    [System.IO.File]::WriteAllLines("$ScriptPath\JobOverlapChecker.exe.config", $configFile)
+    Write-Host "
+Config file generated: $ScriptPath\JobOverlapChecker.exe.config.
+This file will need to be copied, along with the executable (overlap_checker\JobOverlapChecker\bin\Debug\JobOverlapChecker.exe), to all SQL instances you are running the overlap checker on.
+
+You will also need to add a job to each instance with a step that executes the 'AddJobDelayStep' procedure, passing @operation = 'a' to it, followed by a step that executes the JobOverlapChecker.exe binary."
 }
 Catch {
-    Write-Host "Failed to generate config.json: $_" -ForegroundColor White -BackgroundColor Red
+    Write-Host "Failed to generate config file: $_" -ForegroundColor White -BackgroundColor Red
 }
 
 Pause

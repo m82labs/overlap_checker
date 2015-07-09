@@ -9,7 +9,7 @@
             providerName="System.Data.SqlClient"/>
     </connectionStrings>
   <appSettings>
-    <add key="Instance" value=""/>
+    <add key="Instance" value="localhost"/>
     <add key="Schema" value="{{schema}}"/>
     <add key="TargetTable" value="JobDelay"/>
     <add key="JobDataProc" value="GetJobData"/>
