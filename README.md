@@ -1,14 +1,14 @@
-#Overlap Checker
+# Overlap Checker
 Application to reduce SQL Agent Job overlaps by introducing calculated job delays.
 
-###Whats New
+### Whats New
 - Added ability to exclude jobs by adding a custom keyword to either the job description or category
 - Updated the installer
 
-##Overview##
-For a quick overview, please read through the code comments, and my blog post on this project: http://m82labs.com/reduce-overlaps/
+## Overview
+For a quick overview, please read through the code comments, and my blog post on this project: https://markw.dev/reduce-overlaps/
 
-##Installation##
+## Installation
 Installation is fairly straight forward:
   1. Clone this repo.
   2. Open the solution and build it.
@@ -39,5 +39,5 @@ Here is an example `JobOverlapChecker.exe.config` file:
 </configuration>
 ```
 
-##Disclaimer##
+## Disclaimer
 This is my first time posting C# code to Git, and my second time ( maybe third) ever writing C#. Feedback is **VERY** welcome.
